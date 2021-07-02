@@ -1,6 +1,7 @@
 import { SchemaType } from 'dynamodb-toolbox/dist/classes/Entity';
 import { Entity } from 'dynamodb-toolbox';
-import { hash } from 'argon2';
+
+var bcrypt = require('bcryptjs');
 
 export interface IGraphQLHandlerProps {
   id?: string;
@@ -35,7 +36,7 @@ export const getObjectHandler = async <T>(props: IGraphQLHandlerProps): Promise<
 export const createObjectHandler = async (props: IGraphQLHandlerProps): Promise<any> => {
   const id = props.id;
   if (props.type == 'USER') {
-    props.data!.password = await hash(props.data!.password);
+    props.data!.password = bcrypt.hash(props.data!.password, 10);
   }
   const data = {
     id,
