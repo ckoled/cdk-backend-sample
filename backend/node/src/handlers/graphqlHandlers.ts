@@ -13,9 +13,10 @@ export interface IGraphQLHandlerProps {
 }
 
 export const getObjectsHandler = async <T>(props: IGraphQLHandlerProps): Promise<any> => {
+  // use old code
   const filters: any[] = [];
   Object.entries(props.data ?? {}).forEach(([k, v], i) => {
-    filters[i] = { attr: k, eq: v };
+    filters[i] = { attr: `${props.type!.toLowerCase()}_data.${k}`, eq: v };
   });
   const resp = await props.entity.scan({
     limit: 50,

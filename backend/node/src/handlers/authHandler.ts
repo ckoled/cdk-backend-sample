@@ -14,7 +14,7 @@ const loginHandler = async (event: any, context: unknown): Promise<unknown> => {
       },
       entity: createEntity('USER')
     });
-    const user = users[0] as IUser;
+    const user = users[0].data as IUser;
     if (!(await bcrypt.compare(body.password, user.password!))) throw new Error('invalid credentials');
     return { statusCode: 200, body: user.id };
   } catch (e) {
