@@ -38,6 +38,9 @@ export class BackendStack extends Stack {
       environment: {
         TABLE_NAME: graphqlTbl.tableName,
         REGION: graphqlTbl.env.region
+      },
+      bundling: {
+        nodeModules: ["winston"]
       }
     });
 
