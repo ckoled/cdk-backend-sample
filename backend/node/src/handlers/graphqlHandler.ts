@@ -78,7 +78,7 @@ export const handler = async (event: IGraphQLEvent): Promise<any> => {
     });
   } else if (name.startsWith('update')) {
     return await gHandlers.updateObjectHandler({
-      id: event.arguments.data?.id,
+      id: event.arguments.id,
       type,
       data: event.arguments.data,
       entity
