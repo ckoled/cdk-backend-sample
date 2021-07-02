@@ -1,0 +1,27 @@
+# Generic
+.DS_Store
+*.swp
+*.log
+*.bak
+
+# Local environment
+.env
+
+# Node-generated
+node_modules/
+
+# Typescript-generated
+dist/
+src/**/*.d.ts
+src/**/*.d.ts.map
+src/**/*.js
+tsconfig.tsbuildinfo
+
+# CDK-generated
+cdk.out/
+
+# Intellij
+.idea/
+.iml
+
+

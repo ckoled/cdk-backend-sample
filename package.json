@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "author": {
+    "name": "christian"
+  },
+  "version": "1.0.0",
+  "description": "Sample Cdk Backend",
+  "license": "Proprietary",
+  "repository": "https://github.com/...git",
+  "engines": {
+    "node": ">=14"
+  },
+  "workspaces": [
+    "./backend/*"
+  ],
+  "scripts": {
+    "build": "npm run build -ws",
+    "cdk": "cd backend/infra && npx cdk",
+    "clean": "rm -rf node_modules/ && rm package-lock.json && npm run clean -ws"
+  }
+}
