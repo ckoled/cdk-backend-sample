@@ -62,7 +62,6 @@ export const handler = async (event: IGraphQLEvent): Promise<any> => {
     return await gHandlers.getObjectsHandler({
       data: event.arguments.where,
       type,
-      entity
     });
   } else if (name.startsWith('getOne')) {
     return await gHandlers.getObjectHandler({

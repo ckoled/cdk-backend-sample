@@ -15,6 +15,7 @@ export class BackendStack extends Stack {
       schema: Schema.fromAsset(path.join(__dirname, 'graphql', 'schema.graphql')),
       authorizationConfig: {
         defaultAuthorization: {
+          // use jwt
           authorizationType: AuthorizationType.API_KEY
         }
       },

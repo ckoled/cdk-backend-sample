@@ -1,7 +1,11 @@
 import { SchemaType } from 'dynamodb-toolbox/dist/classes/Entity';
 import { Entity } from 'dynamodb-toolbox';
+import { marshallOptions, marshall as utilMarshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { AttributeValue, DynamoDB, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 
 var bcrypt = require('bcryptjs');
+
+export const client = new DynamoDB({ region: process.env.REGION });
 
 export interface IGraphQLHandlerProps {
   id?: string;
@@ -9,20 +13,47 @@ export interface IGraphQLHandlerProps {
   data?: {
     [key: string]: any;
   };
-  entity: Entity<{ [x: string]: SchemaType }>;
+  entity?: Entity<{ [x: string]: SchemaType }>;
+}
+
+export function marshall<T extends { [K in keyof T]: unknown }>(
+  data: T,
+  options?: marshallOptions | undefined
+): {
+  [key: string]: AttributeValue;
+} {
+  return utilMarshall(data, { ...options, removeUndefinedValues: true });
 }
 
 export const getObjectsHandler = async <T>(props: IGraphQLHandlerProps): Promise<any> => {
-  // use old code
-  const filters: any[] = [];
-  Object.entries(props.data ?? {}).forEach(([k, v], i) => {
-    filters[i] = { attr: `${props.type!.toLowerCase()}_data.${k}`, eq: v };
-  });
-  const resp = await props.entity.scan({
-    limit: 50,
-    filters
-  });
-  return resp.Items?.map((item: any) => item.data as T);
+  // USE GSI'S!!!!!!!
+  let args: ScanCommandInput = {
+    TableName: process.env.TABLE_NAME
+  };
+  if (props.data) {
+    const params = { ...props.data };
+    let fltrExpr = '';
+    Object.entries(params).forEach(([k, v]) => {
+      fltrExpr += `#data.${k}=:${k} and `;
+    });
+    fltrExpr = fltrExpr.substr(0, fltrExpr.length - 5);
+
+    args = {
+      ...args,
+      FilterExpression: fltrExpr,
+      ExpressionAttributeNames: {
+        '#data': `${props.type?.toLowerCase()}_data`
+      },
+      ExpressionAttributeValues: marshall(Object.fromEntries(Object.entries(params).map(([k, v]) => [`:${k}`, v])))
+    };
+  }
+
+  try {
+    const resp = await client.scan(args);
+    return resp.Items?.map((item) => unmarshall(item)[`${props.type?.toLowerCase()}_data`] as T);
+  } catch (e) {
+    return null;
+  }
 };
 
 export const getObjectHandler = async <T>(props: IGraphQLHandlerProps): Promise<any> => {
@@ -31,13 +62,13 @@ export const getObjectHandler = async <T>(props: IGraphQLHandlerProps): Promise<
     type: props.type?.toUpperCase()
   };
 
-  return (await props.entity.get(key)).Item.data as T;
+  return (await props.entity!.get(key)).Item.data as T;
 };
 
 export const createObjectHandler = async (props: IGraphQLHandlerProps): Promise<any> => {
   const id = props.id;
   if (props.type == 'USER') {
-    props.data!.password = bcrypt.hash(props.data!.password, 10);
+    props.data!.password = bcrypt.hashSync(props.data!.password, 10);
   }
   const data = {
     id,
@@ -54,7 +85,7 @@ export const createObjectHandler = async (props: IGraphQLHandlerProps): Promise<
     data: data
   } as Partial<{ [x: string]: SchemaType }>;
 
-  await props.entity.put(item);
+  await props.entity!.put(item);
   return data;
 };
 
@@ -67,7 +98,7 @@ export const updateObjectHandler = async (props: IGraphQLHandlerProps): Promise<
     }
   } as Partial<{ [x: string]: SchemaType }>;
 
-  await props.entity.update(item);
+  await props.entity!.update(item);
   return props.id;
 };
 
@@ -77,6 +108,6 @@ export const deleteObjectHandler = async (props: IGraphQLHandlerProps): Promise<
     type: props.type
   };
 
-  await props.entity.delete(key);
+  await props.entity!.delete(key);
   return props.id;
 };
