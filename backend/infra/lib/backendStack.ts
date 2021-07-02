@@ -21,7 +21,6 @@ export class BackendStack extends Stack {
     });
 
     const graphqlTbl = new Table(this, 'graphqlTable', {
-      tableName: 'graphqlTable',
       partitionKey: {
         name: 'pk',
         type: AttributeType.STRING
