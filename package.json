@@ -14,8 +14,12 @@
     "./backend/*"
   ],
   "scripts": {
+    "init": "npm i && npm run build",
+    "deploy": "npm run cdk -- deploy",
+    "init:deploy": "npm run init && npm run deploy",
     "build": "npm run build -ws",
     "cdk": "cd backend/infra && npx cdk",
-    "clean": "rm -rf node_modules/ && rm package-lock.json && npm run clean -ws"
+    "clean": "rm -rf node_modules/ && rm package-lock.json && npm run clean -ws",
+    "destroy": "npm run cdk -- destroy && npm run clean"
   }
 }
