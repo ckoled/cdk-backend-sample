@@ -1,0 +1,15 @@
+# .editorconfig
+root = true
+
+[*]
+
+[*.{js,json,py,ts,tsx}]
+charset = utf-8
+
+[*.{js,json,py,ts,tsx}]
+indent_style = space
+indent_size = 2
+
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true

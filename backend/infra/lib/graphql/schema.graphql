@@ -1,0 +1,41 @@
+type User {
+  id: ID!
+  username: String
+  primary_email: String
+  first_name: String
+  last_name: String
+  created: String!
+  created_by: ID!
+  last_modified: String!
+  last_modified_by: ID!
+}
+input UserInput {
+  username: String
+  primary_email: String
+  first_name: String
+  last_name: String
+}
+input CreateUserInput {
+  username: String!
+  password: String!
+  primary_email: String!
+  first_name: String!
+  last_name: String!
+}
+type Query {
+  getManyUsers(where: UserInput): [User]
+  getOneUser(id: ID!): User
+}
+type Mutation {
+  createUser(data: CreateUserInput!): User
+  updateUser(data: UserInput!): ID
+  deleteUser(id: ID!): ID
+}
+type Subscription {
+  
+}
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
